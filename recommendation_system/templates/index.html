@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <link href="../static/recommendation.css" rel="stylesheet">
+
+    <style>
+         
+            .top{
+                background-color: #006dd0;
+                color: #f5faff;
+                font-weight: 600;
+                line-height: 1.80;
+                padding: 4px;
+                text-align: center;
+                font-size: 20px;
+            }
+
+            .title{
+                font-family: serif;
+                font-size: 28px;
+            }
+
+            .container_padding{
+                padding: 20px 30px;
+            }
+
+            .form_basic{
+                height: 130px;
+                background: whitesmoke;
+                padding: 30px 50px;
+                width: 1250px;
+                margin-left: 30px;
+            }
+
+            input[type=text], select, textarea {
+                width: 100%;
+                padding: 7px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                resize: vertical;
+            }
+
+            label {
+                padding: 8px 20px 12px 0;
+                display: inline-block;
+                font-weight: 600;
+            }
+
+            input[type=submit] {
+                background-color: #0070ba;
+                color: #fff;
+                padding: 7px 20px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                float: right;
+            }
+
+            table {
+                font-family: arial, sans-serif;
+                border-collapse: collapse;
+                width: 87%;
+            }
+
+            td, th {
+                border: 1px solid #dddddd;
+                text-align: left;
+                padding: 6px;
+            }
+
+            tr:nth-child(even) {
+                background-color: #dddddd;
+            }
+
+            footer {
+                text-align: center;
+            }
+
+            .grid_tittle{
+                margin-left: 60px;
+                font-size: 18px;
+                color: brown;
+            }
+
+            .table_layout{
+                padding: 20px 15px; margin-left: 50px;
+            }
+
+    </style>
+
+  </head>
+  
+    <body>
+        <div class="top">
+            <h2 class="title"> Recommendation System </h2>
+        </div>
+        
+        <div class="container-fluid container_padding">
+            <form action="/Submit" method="post">
+                <div class="row form_basic">
+                    <div>
+                    <label for="uname">User Name : </label>
+                    </div>
+                    <div>
+                    <input type="text" name="username" placeholder="User name.." value="{{
+                        request.form.username }}">
+                    </div>
+
+                    <div style= "margin-left: 100px;">
+                        <input type="submit" name='Submit' value="Submit">
+                    </div>
+                </div>
+            </form>
+
+            {% if error %}
+                <p class="error"><strong>Error:</strong> {{ error }}
+            {% endif %}
+        </div>
+        
+        {% if show_content %}
+
+        <div>
+            <h2 class= "grid_tittle"> Top Recommended Products to {{request.form.username }} :<h2>
+        </div>
+
+        <div class="table_layout">
+            <table>
+                <tr>
+                    {% for col in column_names %}
+                        <th style="background: #1e6091; color: white;">{{col}}</th>
+                    {% endfor %}
+                </tr>
+                {% for row in row_data %}
+                <tr>
+                    {% for col, row_ in zip(column_names, row) %}
+                
+                        <td>{{row_}}</td>
+                    
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            
+            </table>
+        </div>
+
+        <div>
+            <footer id="footer" class="wow fadeIn">
+                
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                <div class="text">
+                                    <p>&copy; Copyright @ Rafik Ahamed</p>
+                                </div>
+                            </div>
+                    
+            </footer>
+        </div>
+        
+        {% endif %}
+
+    </body>
+
+</html>
