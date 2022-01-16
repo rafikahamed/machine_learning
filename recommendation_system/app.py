@@ -72,7 +72,12 @@ def Submit():
             show_flag = True
             print(top_product)
 
-    return render_template("index.html", column_names=top_product.columns.values, row_data=list(top_product.values.tolist()), zip=zip, show_content = show_flag)
+
+        else:
+            error = 'User Name Is empty. Please '
+
+    return render_template("index.html", column_names=top_product.columns.values, 
+    row_data=list(top_product.values.tolist()), zip=zip, show_content = show_flag, error=error)
 
 
 if __name__ == '__main__':
