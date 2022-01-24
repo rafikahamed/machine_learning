@@ -42,6 +42,8 @@
                 padding: 30px 50px;
                 width: 1250px;
                 margin-left: 30px;
+                border-radius: 15px;
+                border: 0.2px solid #ccc;
             }
 
             input[type=text], select, textarea {
@@ -71,7 +73,7 @@
             table {
                 font-family: arial, sans-serif;
                 border-collapse: collapse;
-                width: 87%;
+                width: 85%;
             }
 
             td, th {
@@ -91,7 +93,7 @@
             .grid_tittle{
                 margin-left: 60px;
                 font-size: 18px;
-                color: brown;
+                color: #432e2e;
             }
 
             .table_layout{
@@ -127,21 +129,21 @@
 
         <div>
             {% if error %}
-                <p class="error"><strong>Error:</strong> {{ error }}
+                <p class="error" style="color: #d61212;margin-left: 60px;"><strong>Error Message:</strong> {{ error }}
             {% endif %}
         </div>
         
         {% if show_content %}
 
         <div>
-            <h2 class= "grid_tittle"> Top Recommended Products to {{request.form.username }} :<h2>
+            <h2 class= "grid_tittle"> Top Five Recommended Products to {{request.form.username }} :<h2>
         </div>
 
         <div class="table_layout">
             <table>
                 <tr>
                     {% for col in column_names %}
-                        <th style="background: #1e6091; color: white;">{{col}}</th>
+                        <th style="background: #1977bc; color: white;">{{col}}</th>
                     {% endfor %}
                 </tr>
                 {% for row in row_data %}
