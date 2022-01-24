@@ -1,16 +1,18 @@
-from flask import Flask, render_template
-from flask import request
-import pickle
-import pandas as pd
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-import xgboost as xgb
+from flask import Flask, render_template, request
+from model import RecommendationSystem
+import warnings
 
+warnings.filterwarnings("ignore")
 
-app = Flask(__name__)
+app = Flask(__name__)  # intitialize the flaks app  # common
+
+#Instance of the recommendation object
+recommendation_system = RecommendationSystem()
 
 @app.route("/")
 def home():
     return render_template("index.html")
+
 
 @app.route("/Submit",  methods=['POST'])
 def Submit():
@@ -18,80 +20,22 @@ def Submit():
     if request.method == 'POST':
 
         if request.form['username']:
-            usernmae = ''
             print(request.form['username'])
-            usernmae = request.form['username']
-            top_product = pd.DataFrame()
             show_flag =False
             error = None
             
-        try:
-            # Load recommendation file
-            recommendation_df = pd.read_pickle("./models/item_recommendation.pkl")
+            ## Calling the Model File
+            top_product = recommendation_system.recommend_products( request.form['username'])
 
-            # Reading Preprocessed data file
-            ratings = pd.read_csv('./data/sample30_clean.csv' , encoding='latin-1', index_col=0)
-
-            # load the vectorizer file
-            word_vectorizer = pickle.load(open('./models/word_vectorizer.pkl', 'rb'))
-
-            # load sentiment model file
-            loaded_model = pickle.load(open("./models/model_sentiment.pkl", "rb"))
-
-            product = recommendation_df.loc[usernmae].sort_values(ascending=False)[0:20]
-            recommendated_product = pd.DataFrame(product)
-          
-
-            #predict sentiment function is used to predict the sentiment for the given text
-            def predict_sentiment(reviews_text):
-                test_data = TfidfVectorizer(vocabulary=word_vectorizer.get_feature_names_out())
-                X_test_value = test_data.fit_transform(reviews_text)
-                sentiment_val= ''
-                sentiment_val = pd.DataFrame(loaded_model.predict(X_test_value), columns=['sentiment'])
-                reviews_text.reset_index(drop=True, inplace=True)
-                sentiment_val.reset_index(drop=True, inplace=True) 
-                product_sentiment = pd.concat([reviews_text, sentiment_val], axis=1)
-
-                return product_sentiment
-
-            
-            def recommendate_product():
-                selected_reviews_list = pd.DataFrame()
-                for index, row in recommendated_product.iterrows():
-                    product_filter = ratings["name"].isin([row.name])
-                    selected_items = ratings[product_filter]
-                    selected_reviews = predict_sentiment(selected_items.reviews_text)
-                    selected_reviews["name"] = row.name
-                    selected_reviews_list = selected_reviews_list.append(selected_reviews)
-       
-                return selected_reviews_list
-            
-            recommendated_product_review = recommendate_product()
-
-            def filter_top5_product():
-                sentiment_count = recommendated_product_review.groupby(['name','sentiment']).size().reset_index(name='counts')
-                total_product = recommendated_product_review.groupby(['name']).size().reset_index(name='total_counts')
-                product_sentiment = pd.merge(sentiment_count,total_product[['name','total_counts']],on='name', how='right')
-                product_sentiment['percentage'] = (product_sentiment['counts']/product_sentiment['total_counts'])*100
-                positive_product_sentiment = product_sentiment[(product_sentiment['sentiment'] == 1) & (product_sentiment['percentage'] >=30) ]
-                top5_positive_product = positive_product_sentiment.sort_values('percentage',ascending=False)[0:5]
-
-                return top5_positive_product
-
-
-            top5_product  = filter_top5_product()
-            top5_product.reset_index(inplace = True)
-            top_product = pd.DataFrame(top5_product['name'])
-            show_flag = True
-            print(top_product)
-
-        except KeyError:
-            print("Inside Error")
-            error = 'The Given name is not present in the dataset. Request you to provide the available username'
-
-
-    return render_template("index.html", column_names=top_product.columns.values, 
-    row_data=list(top_product.values.tolist()), zip=zip, show_content = show_flag, error=error)
+            if top_product is None:
+                error = 'The Given username is not present in the dataset. Request you to provide the available username'
+                return render_template("index.html", column_names=None, 
+                        row_data=None, zip=zip, show_content = show_flag, error=error)
+            else:
+                show_flag = True
+                error = None
+                return render_template("index.html", column_names=top_product.columns.values, 
+                row_data=list(top_product.values.tolist()), zip=zip, show_content = show_flag, error=error)
 
 
 if __name__ == '__main__':
